@@ -4,6 +4,7 @@ import { getKeypairFromEnvironment } from "@solana-developers/helpers";
 
 dotenv.config();
 
+// Get recipient's public key from command line arguments
 const suppliedToPubKey = process.argv[2]||null;
 
 if(!suppliedToPubKey){
@@ -11,6 +12,7 @@ if(!suppliedToPubKey){
     process.exit(1);
 }
 
+//sender's keypair from environment variables
 const senderKeyPair = getKeypairFromEnvironment("SECRET_KEY");
 console.log(`supplied to public key : ${suppliedToPubKey}`)
 const toPubKey = new PublicKey(suppliedToPubKey);
@@ -19,7 +21,8 @@ const connection = new Connection("https://api.devnet.solana.com","confirmed");
 console.log("loaded the keypair, the destination public key, and connected to devnet");
 
 const transaction = new Transaction();
-const LAMPORTS_TO_SEND  = 5000;
+//Amount to send in lamports (1 SOL = 1,000,000,000 lamports)
+const LAMPORTS_TO_SEND = 5000;
 
 const sendSolInstruction = SystemProgram.transfer({
     fromPubkey: senderKeyPair.publicKey,
