@@ -29,7 +29,6 @@ const sendSolInstruction = SystemProgram.transfer({
     toPubkey: toPubKey,
     lamports: LAMPORTS_TO_SEND,
 });
-
 transaction.add(sendSolInstruction);
 
 const signature = await sendAndConfirmTransaction(connection,transaction,[
