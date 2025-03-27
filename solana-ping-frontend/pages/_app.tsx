@@ -1,7 +1,21 @@
-import '../styles/globals.css'
+import { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+require('@solana/wallet-adapter-react-ui/styles.css');
+
+const WalletConnectionProvider = dynamic(
+  () => import('../contexts/WalletConnectionProvider'),
+  {
+    ssr: false,
+  }
+);
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <WalletConnectionProvider>
+      <Component {...pageProps} />
+    </WalletConnectionProvider>
+  );
 }
 
-export default MyApp
+export default MyApp;

@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@solana-developers/helpers": "^2.8.1",
     "@solana/wallet-adapter-base": "^0.9.5",
     "@solana/wallet-adapter-react": "^0.15.4",
     "@solana/wallet-adapter-react-ui": "^0.9.6",
     "@solana/wallet-adapter-wallets": "^0.15.5",
     "@solana/web3.js": "^1.37.0",
+    "dotenv": "^16.4.7",
     "next": "12.1.2",
     "react": "18.0.0",
     "react-dom": "18.0.0"
