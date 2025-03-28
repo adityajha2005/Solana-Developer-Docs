@@ -1,9 +1,11 @@
 {
   "dependencies": {
+    "@solana-developers/helpers": "^2.8.1",
     "@solana/spl-token": "^0.4.13",
     "@solana/wallet-adapter-base": "^0.9.24",
     "@solana/wallet-adapter-react": "^0.15.36",
     "@solana/wallet-adapter-react-ui": "^0.9.36",
-    "@solana/web3.js": "^1.98.0"
+    "@solana/web3.js": "^1.98.0",
+    "esrun": "^3.2.26"
   }
 }
