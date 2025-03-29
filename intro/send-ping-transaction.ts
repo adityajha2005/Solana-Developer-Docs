@@ -44,3 +44,5 @@ const signature = await web3.sendAndConfirmTransaction(
 );
 
 console.log(`✅ Transaction completed! Signature is ${signature}`);
+//✅ Success! Mint Token Transaction: 
+// https://explorer.solana.com/tx/YAssK2eYPmgjJhq7vFgSZYh7TLr28SknpjBikeSZDGn8Rmrjt1fR4EZnhD4FyAdKkTmjG9bTo8puByQtDHQtvy2?cluster=devnet

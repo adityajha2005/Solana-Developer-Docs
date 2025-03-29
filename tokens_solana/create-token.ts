@@ -35,44 +35,60 @@ const metadataPDAAndBump = PublicKey.findProgramAddressSync(
 
 const metadataPDA = metadataPDAAndBump[0];
 
-const createMetadataAccountInstruction = createCreateMetadataAccountV3Instruction(
-    {
-        metadata: metadataPDA,
-        mint: tokenMintAccount,
-        mintAuthority: user.publicKey,
-        payer: user.publicKey,
-        updateAuthority: user.publicKey,
-    },
-    {
-        createMetadataAccountArgsV3: {
-            data: metadataData,
-            isMutable: true,
-            collectionDetails: null
-        }
+// Add check for existing metadata
+try {
+    const accountInfo = await connection.getAccountInfo(metadataPDA);
+    if (accountInfo !== null) {
+        console.log("Metadata account already exists!");
+        process.exit(1);
     }
-);
 
-const transaction = new Transaction().add(createMetadataAccountInstruction);
+    const createMetadataAccountInstruction = createCreateMetadataAccountV3Instruction(
+        {
+            metadata: metadataPDA,
+            mint: tokenMintAccount,
+            mintAuthority: user.publicKey,
+            payer: user.publicKey,
+            updateAuthority: user.publicKey,
+        },
+        {
+            createMetadataAccountArgsV3: {
+                data: metadataData,
+                isMutable: true,
+                collectionDetails: null
+            }
+        }
+    );
 
-const transactionSignature = await sendAndConfirmTransaction(
-    connection,
-    transaction,
-    [user]
-);
+    const transaction = new Transaction().add(createMetadataAccountInstruction);
 
-const transactionLink = getExplorerLink(
-    "transaction",
-    transactionSignature,
-    "devnet"
-);
+    const transactionSignature = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [user]
+    );
 
-console.log(`✅ Transaction confirmed, explorer link is: ${transactionLink}`);
+    const transactionLink = getExplorerLink(
+        "transaction",
+        transactionSignature,
+        "devnet"
+    );
 
-const tokenMintLink = getExplorerLink(
-    "address", 
-    tokenMintAccount.toString(),
-    "devnet"
-);
+    console.log(`✅ Transaction confirmed, explorer link is: ${transactionLink}`);
 
-console.log(`✅ Look at the token mint again: ${tokenMintLink}`);
+    const tokenMintLink = getExplorerLink(
+        "address", 
+        tokenMintAccount.toString(),
+        "devnet"
+    );
+
+    console.log(`✅ Look at the token mint again: ${tokenMintLink}`);
+} catch (error) {
+    if (error instanceof Error) {
+        console.error(`Error: ${error.message}`);
+    } else {
+        console.error('An unknown error occurred');
+    }
+    process.exit(1);
+}
 
