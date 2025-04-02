@@ -1,34 +1,61 @@
-// import { findMetadataPda, mplTokenMetadata, verifyCollectionV1 } from "@metaplex-foundation/mpl-token-metadata";
-// import { keypairIdentity, publicKey as UMIPublicKey } from "@metaplex-foundation/umi";
-// import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-// import { IrysUploader } from "@metaplex-foundation/umi-uploader-irys";
-// import { airdropIfRequired, getExplorerLink, getKeypairFromFile } from "@solana-developers/helpers";
-// import { clusterApiUrl,Connection,LAMPORTS_PER_SOL } from "@solana/web3.js";
-
-// const connection = new Connection(clusterApiUrl("devnet"));
-// const keypairPath = "/home/aditya/.config/solana/id.json";
-// const user = await getKeypairFromFile(keypairPath);
-// console.log("Loaded user:", user.publicKey.toBase58());
-
-// await airdropIfRequired(
-//     connection,
-//     user.publicKey,
-//     1* LAMPORTS_PER_SOL,
-//     0.1* LAMPORTS_PER_SOL
-// )
-
-// const umi = createUmi(connection)
-
-// //connection address from create metaplex nft collection
-// const collectionAddress = UMIPublicKey("https://explorer.solana.com/address/EXE1Y4fypcHgVu56X1N66gb2GtPUUgwP1oR1ehatBpmC?cluster=devnet");
-// //nft address from create metaplex nft collection
-// const nftAddress = UMIPublicKey("BXbnE3EKb7WMcUjotoXCZDbWCS1iszYToqBoFuPhuJDy");
-// const metadata = findMetadataPda(umi,{mint:nftAddress});
-// await verifyCollectionV1(umi,{
-//     metadata,
-//     collectionMint: collectionAddress,
-//     authority:umi.identity,
-// }).sendAndConfirm(umi);
-
-// let explorerLink = getExplorerLink("address",nftAddress,"devnet")
-// console.log(`verified collection:  ${explorerLink}`);
+import {
+    mplTokenMetadata,
+    verifyCollectionV1,
+    findMetadataPda,
+  } from "@metaplex-foundation/mpl-token-metadata";
+  import {
+    airdropIfRequired,
+    getExplorerLink,
+    getKeypairFromFile,
+  } from "@solana-developers/helpers";
+  import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+  import { keypairIdentity, publicKey } from "@metaplex-foundation/umi";
+  import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from "@solana/web3.js";
+  
+  const connection = new Connection(clusterApiUrl("devnet"));
+  
+  const user = await getKeypairFromFile();
+  
+  const collectionAddress = publicKey("EXE1Y4fypcHgVu56X1N66gb2GtPUUgwP1oR1ehatBpmC");
+  
+  const nftAddress = publicKey("42vk1tn1xBgktorceGe8mquzgVhapx649Pr8Sbqdbm8H");
+  
+  await airdropIfRequired(
+    connection,
+    user.publicKey,
+    1 * LAMPORTS_PER_SOL,
+    0.1 * LAMPORTS_PER_SOL
+  );
+  
+  console.log("Loaded user:", user.publicKey.toBase58());
+  
+  // Create Umi Instance, using the same endpoint as our connection,
+  // and using our user to sign transactions
+  const umi = createUmi(connection.rpcEndpoint).use(mplTokenMetadata());
+  const umiKeypair = umi.eddsa.createKeypairFromSecretKey(user.secretKey);
+  umi.use(keypairIdentity(umiKeypair));
+  
+  // See https://developers.metaplex.com/token-metadata/collections
+  const transaction = await verifyCollectionV1(umi, {
+    // The metadata PDA for the NFT we want to verify inside the collection.
+    metadata: findMetadataPda(umi, { mint: nftAddress }),
+    // The Collection NFT that is already set on the Metadata account of the NFT but not yet verified.
+    collectionMint: collectionAddress,
+    // The Update Authority of the Collection NFT as a signer, in this case the umiKeypair
+    authority: umi.identity,
+  });
+  
+  transaction.sendAndConfirm(umi);
+  
+  console.log(
+    `✅ NFT ${nftAddress} verified as member of collection ${collectionAddress}! See Explorer at ${getExplorerLink(
+      "address",
+      nftAddress,
+      "devnet"
+    )}`
+  );
+  
+  console.log("✅ Finished successfully!");
+// ✅ NFT 42vk1tn1xBgktorceGe8mquzgVhapx649Pr8Sbqdbm8H verified as member of collection EXE1Y4fypcHgVu56X1N66gb2GtPUUgwP1oR1ehatBpmC! 
+// See Explorer at https://explorer.solana.com/address/42vk1tn1xBgktorceGe8mquzgVhapx649Pr8Sbqdbm8H?cluster=devnet
+// ✅ Finished successfully!
